@@ -58,6 +58,9 @@ jobs:
         with:
           path: dist
           merge-multiple: true
-      - run: gh release create "$GITHUB_REF_NAME" dist/* --repo "$GITHUB_REPOSITORY" --title "$GITHUB_REF_NAME" --generate-notes
+      # se la release esiste già (tag spostato), sostituisce i file invece di fallire
+      - run: >
+          gh release create "$GITHUB_REF_NAME" dist/* --repo "$GITHUB_REPOSITORY" --title "$GITHUB_REF_NAME" --generate-notes
+          || gh release upload "$GITHUB_REF_NAME" dist/* --repo "$GITHUB_REPOSITORY" --clobber
         env:
           GH_TOKEN: ${{ github.token }}
