@@ -1,0 +1,63 @@
+# Ad ogni tag vX.Y.Z compila l'app per Windows, Linux e macOS e pubblica la release.
+name: Release
+on:
+  push:
+    tags: ["v*"]
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - { os: ubuntu-latest, name: linux-x64 }
+          - { os: windows-latest, name: windows-x64 }
+          - { os: macos-latest, name: macos }
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: gui
+        shell: bash
+    steps:
+      - uses: actions/checkout@v5
+      - name: Librerie di sistema (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y libwayland-dev libxkbcommon-dev libgl1-mesa-dev
+      - run: cargo test --release
+      - name: Pacchetto Linux
+        if: runner.os == 'Linux'
+        run: |
+          cargo build --release
+          tar -czf ../telegram-downloader-${{ matrix.name }}.tar.gz -C target/release telegram-downloader
+      - name: Pacchetto Windows
+        if: runner.os == 'Windows'
+        run: |
+          cargo build --release
+          cp target/release/telegram-downloader.exe ../telegram-downloader-${{ matrix.name }}.exe
+      - name: Pacchetto macOS (Apple Silicon + Intel)
+        if: runner.os == 'macOS'
+        run: |
+          rustup target add aarch64-apple-darwin x86_64-apple-darwin
+          cargo build --release --target aarch64-apple-darwin
+          cargo build --release --target x86_64-apple-darwin
+          mkdir -p dist
+          lipo -create -output dist/telegram-downloader target/{aarch64,x86_64}-apple-darwin/release/telegram-downloader
+          BIN=dist/telegram-downloader ./install.sh dist
+          ditto -c -k --keepParent "dist/Telegram Downloader.app" ../telegram-downloader-${{ matrix.name }}.zip
+      - uses: actions/upload-artifact@v5
+        with:
+          name: ${{ matrix.name }}
+          path: telegram-downloader-*
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v5
+        with:
+          path: dist
+          merge-multiple: true
+      - run: gh release create "$GITHUB_REF_NAME" dist/* --repo "$GITHUB_REPOSITORY" --title "$GITHUB_REF_NAME" --generate-notes
+        env:
+          GH_TOKEN: ${{ github.token }}

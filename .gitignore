@@ -1,0 +1,7 @@
+.venv/
+__pycache__/
+gui/target/
+gui/dist/
+# sessioni Telegram: danno accesso all'account
+*.session
+session*
