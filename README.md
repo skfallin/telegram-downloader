@@ -1,6 +1,23 @@
-# Telegram downloader
+<p align="center"><img src="assets/logo.png" width="128" alt="Logo di Telegram Downloader"></p>
+<h1 align="center">Telegram Downloader</h1>
+<p align="center">Scarica tutti i file di un gruppo o canale Telegram di cui fai parte, usando il tuo account.</p>
+<p align="center">
+  <a href="https://github.com/skfallin/telegram-downloader/releases/latest"><img src="https://img.shields.io/github/v/release/skfallin/telegram-downloader?label=download&color=e8321e" alt="Ultima versione"></a>
+  <a href="https://github.com/skfallin/telegram-downloader/actions/workflows/release.yml"><img src="https://github.com/skfallin/telegram-downloader/actions/workflows/release.yml/badge.svg" alt="Build"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/licenza-MIT-0b0b0b" alt="Licenza MIT"></a>
+  <img src="https://img.shields.io/badge/Windows%20·%20macOS%20·%20Linux-f7e81a" alt="Windows, macOS, Linux">
+</p>
 
-Scarica tutti i file di un gruppo o canale Telegram di cui fai parte, usando il tuo account.
+![Scelta dei file di un gruppo](assets/screenshot-files.png)
+
+| Accesso con QR code | Download in corso |
+|---|---|
+| ![Accesso con QR code](assets/screenshot-qr.png) | ![Download in corso](assets/screenshot-downloading.png) |
+
+- **Tutto in un'app sola**: niente Python, niente terminale. Un eseguibile per Windows, macOS e Linux.
+- **Accesso sicuro**: QR code o numero + codice, con verifica in due passaggi. La sessione resta solo sul tuo computer.
+- **Scegli cosa scaricare**: filtra per foto, video, audio, documenti o per nome.
+- **Riprende da solo**: salta i file già scaricati e aspetta quando Telegram chiede di rallentare.
 
 ## App con interfaccia grafica (Windows, macOS, Linux)
 
@@ -24,18 +41,20 @@ Credenziali e sessione stanno nella cartella `.telegram-downloader` della tua ho
 
 ### Compilarla da sé
 
-Serve [Rust](https://rustup.rs). Su Linux anche `libwayland-dev libxkbcommon-dev libgl1-mesa-dev`.
+Serve [Rust](https://rustup.rs). Su Linux anche `pkg-config libdbus-1-dev libwayland-dev libxkbcommon-dev libgl1-mesa-dev xorg-dev`.
 
 ```bash
 cd gui && cargo run --release
 ```
 Su macOS `gui/install.sh` la compila e la mette in Applicazioni.
 
-Per pubblicare una nuova versione: `git tag v0.2.0 && git push --tags`. GitHub Actions compila per i tre sistemi e crea la release.
+`telegram-downloader --snap schermata.png --scene files` disegna una schermata di esempio senza aprire la finestra (le scene: `--list-scenes`).
+
+Per pubblicare una nuova versione: `git tag vX.Y.Z && git push --tags`. GitHub Actions compila per i tre sistemi e crea la release.
 
 ## Script da terminale (Python)
 
-## Setup (una volta)
+### Setup (una volta)
 
 1. Vai su <https://my.telegram.org> → **API development tools** e crea un'app: ottieni `api_id` e `api_hash`.
 2. Installa:
@@ -47,7 +66,7 @@ Per pubblicare una nuova versione: `git tag v0.2.0 && git push --tags`. GitHub A
    export TG_API_ID=123456 TG_API_HASH=abcdef...
    ```
 
-## Uso
+### Uso
 
 ```bash
 python download.py --list
@@ -58,3 +77,13 @@ Al primo avvio chiede numero di telefono e codice di Telegram (la sessione resta
 python download.py -1001234567890 downloads
 ```
 Al posto dell'ID puoi usare `@username` o un link `t.me/...`. I file finiscono in `downloads/` come `<id messaggio>_<nome>`. Se lo interrompi, rilancialo: salta i file già scaricati.
+
+## Licenza e crediti
+
+Codice sotto licenza [MIT](LICENSE): puoi usarlo, modificarlo e ridistribuirlo liberamente.
+
+- Interfaccia fatta con [Rune](https://github.com/anomalyco/rune), nello stile "poster" di [Spotseek](https://github.com/lopezlav/spotseek).
+- Protocollo Telegram: [grammers](https://codeberg.org/Lonami/grammers) (app) e [Telethon](https://github.com/LonamiWebs/Telethon) (script).
+- Caratteri [Anton](gui/assets/Anton-LICENSE.txt) e [IBM Plex Mono](gui/assets/IBMPlexMono-LICENSE.txt), licenza SIL Open Font.
+
+Non è un prodotto ufficiale di Telegram. Scarica solo contenuti che hai il diritto di salvare.

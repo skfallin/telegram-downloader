@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <rect x="64" y="64" width="896" height="896" rx="200" fill="#0b0b0b"/>
+  <!-- aeroplanino di carta che punta in basso: una freccia di download -->
+  <path d="M212 236 512 690 448 372Z" fill="#f3f2ee"/>
+  <path d="M812 236 512 690 576 372Z" fill="#f3f2ee"/>
+  <path d="M448 372 512 690 576 372 512 250Z" fill="#e8321e"/>
+  <rect x="252" y="744" width="520" height="56" fill="#f7e81a"/>
+</svg>
