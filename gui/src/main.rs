@@ -80,8 +80,10 @@ fn safe(name: &str) -> String {
 }
 
 fn file_name(msg_id: i32, name: Option<&str>, mime: &str) -> String {
-    match name.and_then(|n| Path::new(n).file_name()).and_then(|n| n.to_str()) {
-        Some(base) => format!("{msg_id}_{}", safe(base)),
+    // safe() toglie / \ e : (niente percorsi né unità disco), file_name() scarta "." e ".."
+    let name = name.map(safe);
+    match name.as_deref().and_then(|n| Path::new(n).file_name()).and_then(|n| n.to_str()) {
+        Some(base) => format!("{msg_id}_{base}"),
         None => {
             let ext = mime.rsplit('/').next().filter(|e| !e.is_empty()).unwrap_or("bin");
             format!("{msg_id}_file.{ext}")
@@ -733,9 +735,10 @@ mod tests {
     fn nomi_sicuri() {
         assert_eq!(file_name(5, Some("foto.jpg"), "image/jpeg"), "5_foto.jpg");
         assert_eq!(file_name(5, None, "video/mp4"), "5_file.mp4");
-        assert_eq!(file_name(5, Some("../../etc/passwd"), ""), "5_passwd");
+        assert_eq!(file_name(5, Some("../../etc/passwd"), ""), "5_.._.._etc_passwd");
         assert_eq!(file_name(5, Some(".."), ""), "5_file.bin");
         assert_eq!(file_name(5, Some("a:b?.txt"), ""), "5_a_b_.txt");
-        assert_eq!(file_name(5, Some(r"..\..\x.exe"), ""), if cfg!(windows) { "5_x.exe" } else { "5_.._.._x.exe" });
+        assert_eq!(file_name(5, Some(r"..\..\x.exe"), ""), "5_.._.._x.exe");
+        assert_eq!(file_name(5, Some("C:x.exe"), ""), "5_C_x.exe");
     }
 }
